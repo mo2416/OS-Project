@@ -1,0 +1,54 @@
+# RAPL availability probe, 20260924T115624Z (WSL2 host shell, not the test VM)
+
+$ uname -r
+6.18.33.2-microsoft-standard-WSL2
+
+$ systemd-detect-virt
+wsl
+
+$ /usr/bin/grep -m1 -o hypervisor /proc/cpuinfo
+hypervisor
+
+$ /usr/bin/grep -m1 'model name' /proc/cpuinfo
+model name	: 13th Gen Intel(R) Core(TM) i7-13650HX
+
+$ ls -la /sys/class/powercap/
+total 0
+drwxr-xr-x  2 root root 0 Sep 24 11:55 .
+drwxr-xr-x 71 root root 0 Sep 24 11:55 ..
+
+$ ls /sys/bus/event_source/devices/
+breakpoint
+kprobe
+msr
+power
+software
+tracepoint
+uprobe
+
+$ ls -la /sys/bus/event_source/devices/power/events/
+total 0
+drwxr-xr-x 2 root root 0 Sep 24 11:55 .
+drwxr-xr-x 5 root root 0 Sep 24 11:55 ..
+
+$ ls /dev/cpu/0/msr
+ls: cannot access '/dev/cpu/0/msr': No such file or directory
+
+$ lsmod | /usr/bin/grep -iE rapl
+intel_rapl_msr         16384  0
+intel_rapl_common      40960  1 intel_rapl_msr
+
+$ zcat /proc/config.gz | /usr/bin/grep -E 'RAPL|POWERCAP|X86_MSR'
+CONFIG_PERF_EVENTS_INTEL_RAPL=y
+CONFIG_X86_MSR=m
+CONFIG_POWERCAP=y
+CONFIG_INTEL_RAPL_CORE=m
+CONFIG_INTEL_RAPL=m
+
+$ dmesg | /usr/bin/grep -iE 'rapl|powercap'
+[    0.141685] RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+[    2.394648] intel_rapl_msr: PL4 support detected.
+
+$ command -v perf || echo 'perf: not installed'
+perf: not installed
+

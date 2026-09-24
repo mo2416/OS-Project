@@ -38,7 +38,7 @@ last changed this file.
 |---|---|---|
 | U1 | +25 % context switches at N=8 with stress-ng (row 18) | Partly explained: sched_ext start-up transient (A17); the rest is unexplained |
 | U2 | Latency on a realistic application workload | Not measured (synthetic dutywork + latprobe only) |
-| U3 | Energy | **Not measured**: no RAPL or cpuidle in WSL2/QEMU. Only a coefficient-based proxy (0.64/0.86/0.94) is reported |
+| U3 | Energy | **Not measured**: no RAPL or cpuidle in WSL2/QEMU. Only a coefficient-based proxy (0.64/0.86/0.94) is reported. Bare-metal RAPL run attempted 2026-09-24: **blocked** (host exposes 0 RAPL counters; `docs/RAPL_EXPERIMENT.md`) |
 | U4 | Statistical confidence | Resolved for the main matrix (n = 10, paired CIs); the sweep is still 2 reps |
 | U5 | Retuned defaults / guard default-on | Not done on purpose; the guard stays opt-in |
 | U6 | Full-load base-policy latency (+2.2–2.4 ms p99) | Observed and measured, not addressed |

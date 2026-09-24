@@ -4,6 +4,11 @@ All entries are backed by commits; evidence paths are relative to the repository
 
 ## [Unreleased]
 
+## 2026-09-24 — RAPL experiment: blocked
+- `docs/RAPL_EXPERIMENT.md`: the planned protocol, the environment check and the requirements
+  for a bare-metal run. Evidence: `results/raw/env/rapl_probe_20260924T115624Z.txt`.
+  No energy measured; no scheduler, test or result changes.
+
 ## 2026-09-24 — Review-2 documentation
 - `docs/REVIEW2_FINAL.md` (authoritative, 8 faculty sections), `docs/REVIEW2_PRESENTATION.md`,
   `docs/FACULTY_QUESTIONS.md`; team and guide details are placeholders.

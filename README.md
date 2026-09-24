@@ -8,7 +8,7 @@ or queueing grows. It is evaluated against the default Linux scheduler (EEVDF).
 
 - Why this design: [docs/RESEARCH_DECISION.md](docs/RESEARCH_DECISION.md)
 - Current results: [docs/RESULTS_SUMMARY.md](docs/RESULTS_SUMMARY.md)
-- Review-2 evidence: [docs/REVIEW2_EVIDENCE.md](docs/REVIEW2_EVIDENCE.md)
+- Review-2 report: [docs/REVIEW2_FINAL.md](docs/REVIEW2_FINAL.md) (slides: [docs/REVIEW2_PRESENTATION.md](docs/REVIEW2_PRESENTATION.md), Q&A: [docs/FACULTY_QUESTIONS.md](docs/FACULTY_QUESTIONS.md), evidence map: [docs/REVIEW2_EVIDENCE.md](docs/REVIEW2_EVIDENCE.md))
 - Progress: [docs/PROGRESS_LOG.md](docs/PROGRESS_LOG.md), [docs/PROGRESS_AUDIT.md](docs/PROGRESS_AUDIT.md), [CHANGELOG.md](CHANGELOG.md)
 
 ## Layout

@@ -4,6 +4,10 @@ All entries are backed by commits; evidence paths are relative to the repository
 
 ## [Unreleased]
 
+## 2026-09-24 — Review-2 documentation
+- `docs/REVIEW2_FINAL.md` (authoritative, 8 faculty sections), `docs/REVIEW2_PRESENTATION.md`,
+  `docs/FACULTY_QUESTIONS.md`; team and guide details are placeholders.
+
 ## 2026-09-24 — `958b081`, `20012ec` latency guard and repeated validation
 ### Added
 - Latency guard in the controller (`-L US`, `-P PM`, off by default): expands the active set

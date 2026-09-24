@@ -128,4 +128,152 @@ accounting.
 | Test and benchmark jobs | `tests/vm_functional.sh`, `vm_bench_*.sh`, `vm_sweep.sh`, `vm_ctxsw.sh` |
 | Analysis | `tests/analyze_*.py` |
 
-<!-- SECTIONS 6-8 ARE WRITTEN AFTER THE REPEATED VALIDATION -->
+## 6. Work Completed / Current Progress
+
+Everything in this section has been built and run. The last column gives the evidence
+(repository paths; commit IDs in `docs/PROGRESS_LOG.md`).
+Result labels: **MEASURED** · **MODELED** (proxy) · **OBSERVED** (not statistically
+established) · **PENDING**.
+
+### 6.1 Environment / setup completed
+| Item | Status | Evidence |
+|---|---|---|
+| Sudo-free toolchain sysroot (clang, pahole, QEMU, stress-ng) | done | `scripts/localenv.sh` |
+| Linux 6.18.53 guest kernel with `CONFIG_SCHED_CLASS_EXT=y`, BTF | built | `results/raw/build/kernel_build_3.log` (`EXIT 0`) |
+| KVM test VM booting the host root over 9p, job runner | working | `vm/run_vm.sh`, `results/raw/vm/smoke_1.log` (`Hypervisor detected: KVM`) |
+
+The WSL2 host kernel itself has no sched_ext, so all scheduler runs happen in the guest.
+
+### 6.2 Implemented modules
+| Module | Status | Evidence |
+|---|---|---|
+| scx_compact BPF policy: active CPU set, idle-CPU placement inside the set, shared vtime queue, dispatch only on active CPUs, escape path for affinity-restricted tasks | implemented, verified | `scheduler/scx_compact.bpf.c` (473 lines) |
+| Controller (BPF timer, 20 ms): EWMA demand, expand/shrink with hysteresis, queue-hold expansion | implemented, verified | `ctl_timerfn` |
+| Latency guard (`-L`, `-P`) | implemented, verified (n = 10) | `ctl_timerfn`, `compact_running`, `compact_quiescent` |
+| Loader: topology-based CPU order, 13 policy options (incl. control mode `-n`), CSV telemetry | implemented | `scheduler/scx_compact.c` |
+| Workloads: fixed-work duty cycle, 1 ms latency probe | implemented | `tests/dutywork.c`, `tests/latprobe.c` |
+| Test / benchmark / analysis harness | implemented | `tests/vm_*.sh`, `tests/analyze_*.py` |
+
+### 6.3 Tests completed (MEASURED)
+Functional suite F1–F6: **12/12 pass**, re-run after the latest scheduler change
+(`results/processed/functional_20260924T111109Z.md`). CPU placement is checked from kernel
+accounting (`/proc/stat`), not from the scheduler's own counters.
+
+| Check | Result |
+|---|---|
+| sched_ext present; reference scheduler `scx_qmap` attaches/detaches | pass |
+| scx_compact attaches, runs all phases, exits cleanly (exit 0) | pass |
+| Idle and 1 busy task: set stays at 2 CPUs, all load inside it | pass |
+| 4 / 8 busy tasks: set expands (6 / 8 CPUs) | pass |
+| Load removed: set shrinks back to 2 | pass |
+| Duty load: compact uses fewer CPUs than EEVDF; the `-n` control does not | pass |
+| Task pinned outside the set is not starved (CPU 7 busy 100 %) | pass |
+| No sched_ext error/stall in dmesg | pass |
+
+### 6.4 Benchmarking completed and results
+**Main experiment (MEASURED, n = 10 per cell,
+`results/processed/bench_repeated_20260924T111310Z.md`).** 8 fixed-work workers × duty % of a
+20 ms period (ideal 5 s) plus a 1 ms latency probe; 4 conditions interleaved in each rep;
+paired bootstrap 95 % CIs. `guard` = `scx_compact -L 1000 -P 10`.
+
+| Load | CPUs used EEVDF / compact / guard | Probe p99 µs EEVDF / compact / guard |
+|---|---|---|
+| 20 % | 6.0 / 3.0 / 4.0 | 350 / 3224 / 489 |
+| 40 % | 7.8 / 5.4 / 7.0 | 389 / 1782 / 446 |
+| 60 % | 8.0 / 6.9 / 7.9 | 1408 (median 509) / 1751 / 437 |
+| 99 % | 8.0 / 8.0 / 8.0 | 1046 / 3354 / 3274 |
+
+Paired differences vs EEVDF (bold = 95 % CI excludes 0):
+
+| Load | compact: CPUs | compact: probe p99 | guard: CPUs | guard: probe p99 | completion time (compact / guard) |
+|---|---|---|---|---|---|
+| 20 % | **−3.0** | **+2.87 ms** | **−2.0** | **+0.14 ms** | **+1.6 %** / n.s. |
+| 40 % | **−2.4** | **+1.39 ms** | **−0.8** | **+0.06 ms** | n.s. / n.s. |
+| 60 % | **−1.1** | n.s. | −0.1 (n.s.) | **−0.97 ms** | n.s. / n.s. |
+| 99 % | 0 | **+2.31 ms** | 0 | **+2.23 ms** | n.s. / n.s. |
+
+Earlier preliminary runs (2–3 reps): a fixed-work CPU-bound benchmark (wall time within ~2 % of
+EEVDF), a parameter sweep (OBSERVED trends only), and a context-switch check (no steady-state
+increase from compaction) — `results/processed/`.
+
+**Energy (MODELED, not measured).** Idle-time proxy relative to EEVDF: compact 0.72 / 0.87 /
+0.92 and guard 0.82 / 0.91 / 0.94 at 20 / 40 / 60 %. The coefficients are assumptions
+(`tests/analyze_partial.py`). **No energy consumption has been measured.**
+
+### 6.5 Current limitations
+1. **No real energy measurement:** WSL2/QEMU exposes no RAPL or cpuidle data (PENDING: bare metal).
+2. **Virtual machine:** vCPUs are host threads (nested virtualization). An idle guest CPU is
+   not a parked physical core; wakeups to halted vCPUs can take > 1 ms; occasional 100–200 ms
+   maxima occur in every condition, so only p95/p99 are interpreted.
+3. **Host drift:** per-rep mean slowdown ranged 0.95–1.34, so only paired comparisons are used.
+4. **Synthetic workloads only** (dutywork, latprobe, busy loops, stress-ng).
+5. **Full-load latency:** every sched_ext condition (including compaction off) has about 2.3 ms
+   higher probe p99 than EEVDF at ~100 % load. The base policy has no wakeup preemption.
+6. The guard thresholds (1 ms, 1 %) are one configuration; the parameter sweep is preliminary (2 reps).
+7. No comparison with an existing sched_ext scheduler yet (scx_lavd needs a Rust toolchain).
+
+### 6.6 Current status
+The scheduler, controller and latency guard are implemented and validated in the VM. The
+core hypothesis (fewer CPUs used under partial load) is **supported by measurement**. The
+latency trade-off is **measured**, and a mitigation is **validated**. **Energy savings are not
+yet demonstrated.** Estimated core technical completion: **about 65 %**
+(`docs/NEXT_PHASE_RESULTS.md` §6).
+
+## 7. Last Contributions / Recent Progress
+
+Review-1 presented the idea: core-compaction scheduling with sched_ext, compared against
+EEVDF. Since Review-1 (repository history from `bd87660`):
+
+1. **Made sched_ext usable in this environment.** The WSL2 kernel lacks sched_ext, so we built a
+   6.18.53 guest kernel and a KVM test VM. Build blockers were resolved: the C: disk filled
+   during linking, a paths-with-spaces bug in the tools build, a kfunc missing on 6.18
+   (`scx_bpf_task_set_dsq_vtime`), and QEMU firmware paths (`docs/PROGRESS_LOG.md` rows 4–15).
+2. **Implemented scx_compact** (BPF policy + loader) and brought it up on sched_ext; it passes
+   all 12 functional checks.
+3. **Controller improvement 1, demand smoothing.** The first controller reacted to 20 ms
+   samples and inflated the set under bursty load. With EWMA smoothing and sustained-queue
+   expansion, CPUs used under the 8×20 % duty load fell from 7 to 5 (functional F4a, one run each).
+4. **Controller improvement 2, latency guard (newest contribution).** The latency cost was
+   diagnosed from the controller's own telemetry: the utilization rule left 4 CPUs for
+   3.1 CPUs of bursty demand. A guard was added that measures *policy-induced* queueing delay
+   and expands the set when its p99 estimate exceeds a target. Diagnostic runs showed that a
+   naive "all waits" metric measures hypervisor wake-up cost and per-CPU kthreads instead of
+   policy delay, so the metric counts only shared-queue waits of unrestricted tasks.
+5. **New tests and workloads:** fixed-work duty-cycle workload, cyclictest-style latency probe,
+   repeated interleaved benchmark with paired bootstrap statistics.
+6. **Measured results (n = 10):**
+   - compaction frees 3.0 / 2.4 / 1.1 CPUs at 20 / 40 / 60 % load;
+   - it costs +2.9 / +1.4 ms probe p99 at 20 / 40 % load;
+   - the guard cuts that to +0.14 / +0.06 ms while keeping 2.0 / 0.8 CPUs parked.
+7. **Parameter validation (preliminary, 2 reps):** a higher shrink threshold compacts more; a
+   longer averaging window worsens tail latency; queue hold 1 looked best at 40 %.
+8. **New observations:**
+   - an earlier 3-rep result ("no latency cost at 20 %") was **overturned** by the n = 10 run
+     with the probe;
+   - the full-load latency penalty belongs to the sched_ext base policy, not to compaction;
+   - context switches are not increased by compaction in steady state.
+
+## 8. Remaining Work & Future Plan
+
+| # | Remaining item | Type | Plan |
+|---|---|---|---|
+| 1 | **Energy measurement with RAPL** (package/core joules) for EEVDF vs compact vs guard | validation, PENDING | Bare-metal Linux boot (USB or dual boot) on the project laptop; `perf stat -e power/energy-pkg/` or powercap sysfs; same dutywork matrix, n ≥ 10 |
+| 2 | SMT / CPU-order study (`-o smt` vs `-o core`) | validation, PENDING | On bare metal only (a VM cannot show SMT power effects) |
+| 3 | Realistic workload | validation, PENDING | One application workload (e.g. a limited-parallelism kernel/compile build, or a request/response server) with the latency probe |
+| 4 | Guard and shrink settings | experiment, PENDING | n = 10 check of 2–3 settings; decide whether the guard becomes the default |
+| 5 | Full-load base-policy latency | investigation, PENDING | Document it, or try a small wakeup-preemption change if it is cheap |
+| 6 | Comparison with scx_lavd (powersave) | comparison, optional | Only if a Rust toolchain can be installed off C:; used as a reference, with no superiority claims |
+| 7 | Final report, demo script, slides | documentation | Demo: live `scx_compact` telemetry under changing load |
+
+**Timeline (relative to Review-2; fill in the dates):**
+
+| Period | Work |
+|---|---|
+| Week 1 after Review-2 | Bare-metal Linux setup; RAPL access; repeat the n = 10 matrix with energy (items 1–2) |
+| Week 2 | Realistic workload; guard/shrink settings check (items 3–4) |
+| Week 3 | Full-load latency note; optional scx_lavd (items 5–6) |
+| Week 4 | Final report, demo, slides (item 7) |
+
+If bare metal is not available, items 1–2 remain future work, and the final report keeps the
+energy result as a clearly labelled proxy.
+

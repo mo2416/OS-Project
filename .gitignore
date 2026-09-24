@@ -1,0 +1,9 @@
+# build outputs
+scheduler/build/
+*.o
+*.skel.h
+*.bpf.o
+# local scratch
+/tmp/
+*.swp
+__pycache__/

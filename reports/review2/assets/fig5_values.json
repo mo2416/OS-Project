@@ -1,0 +1,1018 @@
+{
+ "20": {
+  "CPUs used (≥10 % busy)": {
+   "nocompact": {
+    "mean": 7.3,
+    "ci": 0.76
+   },
+   "compact": {
+    "mean": 3,
+    "ci": 0.67
+   },
+   "guard": {
+    "mean": 4,
+    "ci": 0.67
+   },
+   "eevdf": {
+    "mean": 6,
+    "ci": 0.75
+   }
+  },
+  "CPUs parked (<1 % busy)": {
+   "nocompact": {
+    "mean": 0,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 5,
+    "ci": 0.67
+   },
+   "guard": {
+    "mean": 3.3,
+    "ci": 1.12
+   },
+   "eevdf": {
+    "mean": 1.3,
+    "ci": 0.68
+   }
+  },
+  "active set (mean)": {
+   "nocompact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 2.91,
+    "ci": 0.64
+   },
+   "guard": {
+    "mean": 4,
+    "ci": 0.7
+   },
+   "eevdf": {
+    "mean": 8,
+    "ci": 0
+   }
+  },
+  "slowdown (wall / ideal)": {
+   "nocompact": {
+    "mean": 1.0487,
+    "ci": 0.0441
+   },
+   "compact": {
+    "mean": 1.0618,
+    "ci": 0.0516
+   },
+   "guard": {
+    "mean": 1.0441,
+    "ci": 0.0475
+   },
+   "eevdf": {
+    "mean": 1.0457,
+    "ci": 0.0438
+   }
+  },
+  "dutywork wake p95 µs": {
+   "nocompact": {
+    "mean": 298,
+    "ci": 35
+   },
+   "compact": {
+    "mean": 514,
+    "ci": 414
+   },
+   "guard": {
+    "mean": 274,
+    "ci": 40
+   },
+   "eevdf": {
+    "mean": 283,
+    "ci": 32
+   }
+  },
+  "dutywork wake p99 µs": {
+   "nocompact": {
+    "mean": 412,
+    "ci": 48
+   },
+   "compact": {
+    "mean": 1542,
+    "ci": 1125
+   },
+   "guard": {
+    "mean": 535,
+    "ci": 319
+   },
+   "eevdf": {
+    "mean": 376,
+    "ci": 47
+   }
+  },
+  "work-phase p99 ms": {
+   "nocompact": {
+    "mean": 5.93,
+    "ci": 1.36
+   },
+   "compact": {
+    "mean": 7.08,
+    "ci": 2.25
+   },
+   "guard": {
+    "mean": 6.07,
+    "ci": 1.79
+   },
+   "eevdf": {
+    "mean": 5.58,
+    "ci": 1.2
+   }
+  },
+  "probe p95 µs": {
+   "nocompact": {
+    "mean": 294,
+    "ci": 31
+   },
+   "compact": {
+    "mean": 1963,
+    "ci": 767
+   },
+   "guard": {
+    "mean": 276,
+    "ci": 29
+   },
+   "eevdf": {
+    "mean": 265,
+    "ci": 25
+   }
+  },
+  "probe p99 µs": {
+   "nocompact": {
+    "mean": 415,
+    "ci": 49
+   },
+   "compact": {
+    "mean": 3224,
+    "ci": 866
+   },
+   "guard": {
+    "mean": 489,
+    "ci": 78
+   },
+   "eevdf": {
+    "mean": 350,
+    "ci": 30
+   }
+  },
+  "runqueue wait/slice µs": {
+   "nocompact": {
+    "mean": 12,
+    "ci": 3
+   },
+   "compact": {
+    "mean": 260,
+    "ci": 92
+   },
+   "guard": {
+    "mean": 23,
+    "ci": 13
+   },
+   "eevdf": {
+    "mean": 3,
+    "ci": 1
+   }
+  },
+  "ctxsw/s": {
+   "nocompact": {
+    "mean": 2620,
+    "ci": 128
+   },
+   "compact": {
+    "mean": 2052,
+    "ci": 174
+   },
+   "guard": {
+    "mean": 2604,
+    "ci": 127
+   },
+   "eevdf": {
+    "mean": 2525,
+    "ci": 147
+   }
+  },
+  "timer+resched irq/s": {
+   "nocompact": {
+    "mean": 4470,
+    "ci": 146
+   },
+   "compact": {
+    "mean": 3562,
+    "ci": 391
+   },
+   "guard": {
+    "mean": 4158,
+    "ci": 145
+   },
+   "eevdf": {
+    "mean": 3962,
+    "ci": 88
+   }
+  },
+  "idle CPU-s": {
+   "nocompact": {
+    "mean": 34.23,
+    "ci": 0.37
+   },
+   "compact": {
+    "mean": 34.75,
+    "ci": 0.64
+   },
+   "guard": {
+    "mean": 34.41,
+    "ci": 0.4
+   },
+   "eevdf": {
+    "mean": 35.66,
+    "ci": 0.88
+   }
+  },
+  "E_proxy (model)": {
+   "nocompact": {
+    "mean": 19.78,
+    "ci": 1.8
+   },
+   "compact": {
+    "mean": 13.29,
+    "ci": 2.46
+   },
+   "guard": {
+    "mean": 15.17,
+    "ci": 3.13
+   },
+   "eevdf": {
+    "mean": 18.57,
+    "ci": 2.68
+   }
+  }
+ },
+ "40": {
+  "CPUs used (≥10 % busy)": {
+   "nocompact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 5.4,
+    "ci": 0.6
+   },
+   "guard": {
+    "mean": 7,
+    "ci": 0.58
+   },
+   "eevdf": {
+    "mean": 7.8,
+    "ci": 0.3
+   }
+  },
+  "CPUs parked (<1 % busy)": {
+   "nocompact": {
+    "mean": 0,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 2.1,
+    "ci": 0.71
+   },
+   "guard": {
+    "mean": 0.7,
+    "ci": 0.59
+   },
+   "eevdf": {
+    "mean": 0.1,
+    "ci": 0.23
+   }
+  },
+  "active set (mean)": {
+   "nocompact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 5.29,
+    "ci": 0.58
+   },
+   "guard": {
+    "mean": 6.85,
+    "ci": 0.58
+   },
+   "eevdf": {
+    "mean": 8,
+    "ci": 0
+   }
+  },
+  "slowdown (wall / ideal)": {
+   "nocompact": {
+    "mean": 1.1007,
+    "ci": 0.0924
+   },
+   "compact": {
+    "mean": 1.0968,
+    "ci": 0.086
+   },
+   "guard": {
+    "mean": 1.0749,
+    "ci": 0.0889
+   },
+   "eevdf": {
+    "mean": 1.083,
+    "ci": 0.0911
+   }
+  },
+  "dutywork wake p95 µs": {
+   "nocompact": {
+    "mean": 304,
+    "ci": 34
+   },
+   "compact": {
+    "mean": 280,
+    "ci": 27
+   },
+   "guard": {
+    "mean": 294,
+    "ci": 23
+   },
+   "eevdf": {
+    "mean": 273,
+    "ci": 18
+   }
+  },
+  "dutywork wake p99 µs": {
+   "nocompact": {
+    "mean": 414,
+    "ci": 70
+   },
+   "compact": {
+    "mean": 814,
+    "ci": 482
+   },
+   "guard": {
+    "mean": 602,
+    "ci": 201
+   },
+   "eevdf": {
+    "mean": 369,
+    "ci": 33
+   }
+  },
+  "work-phase p99 ms": {
+   "nocompact": {
+    "mean": 11.53,
+    "ci": 2.55
+   },
+   "compact": {
+    "mean": 11.81,
+    "ci": 1.86
+   },
+   "guard": {
+    "mean": 12.77,
+    "ci": 3.31
+   },
+   "eevdf": {
+    "mean": 11.82,
+    "ci": 3.2
+   }
+  },
+  "probe p95 µs": {
+   "nocompact": {
+    "mean": 300,
+    "ci": 30
+   },
+   "compact": {
+    "mean": 828,
+    "ci": 469
+   },
+   "guard": {
+    "mean": 282,
+    "ci": 21
+   },
+   "eevdf": {
+    "mean": 266,
+    "ci": 19
+   }
+  },
+  "probe p99 µs": {
+   "nocompact": {
+    "mean": 426,
+    "ci": 56
+   },
+   "compact": {
+    "mean": 1782,
+    "ci": 857
+   },
+   "guard": {
+    "mean": 446,
+    "ci": 65
+   },
+   "eevdf": {
+    "mean": 389,
+    "ci": 46
+   }
+  },
+  "runqueue wait/slice µs": {
+   "nocompact": {
+    "mean": 17,
+    "ci": 4
+   },
+   "compact": {
+    "mean": 110,
+    "ci": 51
+   },
+   "guard": {
+    "mean": 54,
+    "ci": 17
+   },
+   "eevdf": {
+    "mean": 4,
+    "ci": 2
+   }
+  },
+  "ctxsw/s": {
+   "nocompact": {
+    "mean": 2506,
+    "ci": 198
+   },
+   "compact": {
+    "mean": 2358,
+    "ci": 190
+   },
+   "guard": {
+    "mean": 2542,
+    "ci": 190
+   },
+   "eevdf": {
+    "mean": 2440,
+    "ci": 201
+   }
+  },
+  "timer+resched irq/s": {
+   "nocompact": {
+    "mean": 6044,
+    "ci": 201
+   },
+   "compact": {
+    "mean": 5573,
+    "ci": 301
+   },
+   "guard": {
+    "mean": 5699,
+    "ci": 237
+   },
+   "eevdf": {
+    "mean": 5371,
+    "ci": 172
+   }
+  },
+  "idle CPU-s": {
+   "nocompact": {
+    "mean": 26.66,
+    "ci": 0.56
+   },
+   "compact": {
+    "mean": 26.76,
+    "ci": 0.53
+   },
+   "guard": {
+    "mean": 27.05,
+    "ci": 0.62
+   },
+   "eevdf": {
+    "mean": 28.11,
+    "ci": 0.81
+   }
+  },
+  "E_proxy (model)": {
+   "nocompact": {
+    "mean": 27.61,
+    "ci": 3.64
+   },
+   "compact": {
+    "mean": 24.37,
+    "ci": 3.83
+   },
+   "guard": {
+    "mean": 25.56,
+    "ci": 3.97
+   },
+   "eevdf": {
+    "mean": 28.02,
+    "ci": 3.79
+   }
+  }
+ },
+ "60": {
+  "CPUs used (≥10 % busy)": {
+   "nocompact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 6.9,
+    "ci": 0.53
+   },
+   "guard": {
+    "mean": 7.9,
+    "ci": 0.23
+   },
+   "eevdf": {
+    "mean": 8,
+    "ci": 0
+   }
+  },
+  "CPUs parked (<1 % busy)": {
+   "nocompact": {
+    "mean": 0,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 1.1,
+    "ci": 0.53
+   },
+   "guard": {
+    "mean": 0,
+    "ci": 0
+   },
+   "eevdf": {
+    "mean": 0,
+    "ci": 0
+   }
+  },
+  "active set (mean)": {
+   "nocompact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 6.55,
+    "ci": 0.47
+   },
+   "guard": {
+    "mean": 7.66,
+    "ci": 0.12
+   },
+   "eevdf": {
+    "mean": 8,
+    "ci": 0
+   }
+  },
+  "slowdown (wall / ideal)": {
+   "nocompact": {
+    "mean": 1.1516,
+    "ci": 0.1413
+   },
+   "compact": {
+    "mean": 1.1264,
+    "ci": 0.1287
+   },
+   "guard": {
+    "mean": 1.1055,
+    "ci": 0.1354
+   },
+   "eevdf": {
+    "mean": 1.1175,
+    "ci": 0.1368
+   }
+  },
+  "dutywork wake p95 µs": {
+   "nocompact": {
+    "mean": 311,
+    "ci": 49
+   },
+   "compact": {
+    "mean": 340,
+    "ci": 112
+   },
+   "guard": {
+    "mean": 280,
+    "ci": 43
+   },
+   "eevdf": {
+    "mean": 263,
+    "ci": 42
+   }
+  },
+  "dutywork wake p99 µs": {
+   "nocompact": {
+    "mean": 411,
+    "ci": 59
+   },
+   "compact": {
+    "mean": 863,
+    "ci": 377
+   },
+   "guard": {
+    "mean": 449,
+    "ci": 93
+   },
+   "eevdf": {
+    "mean": 370,
+    "ci": 68
+   }
+  },
+  "work-phase p99 ms": {
+   "nocompact": {
+    "mean": 17.75,
+    "ci": 3.75
+   },
+   "compact": {
+    "mean": 17.98,
+    "ci": 3.22
+   },
+   "guard": {
+    "mean": 16.47,
+    "ci": 3.07
+   },
+   "eevdf": {
+    "mean": 16.65,
+    "ci": 3.74
+   }
+  },
+  "probe p95 µs": {
+   "nocompact": {
+    "mean": 303,
+    "ci": 34
+   },
+   "compact": {
+    "mean": 469,
+    "ci": 128
+   },
+   "guard": {
+    "mean": 299,
+    "ci": 29
+   },
+   "eevdf": {
+    "mean": 313,
+    "ci": 66
+   }
+  },
+  "probe p99 µs": {
+   "nocompact": {
+    "mean": 432,
+    "ci": 49
+   },
+   "compact": {
+    "mean": 1751,
+    "ci": 243
+   },
+   "guard": {
+    "mean": 437,
+    "ci": 40
+   },
+   "eevdf": {
+    "mean": 1408,
+    "ci": 912
+   }
+  },
+  "runqueue wait/slice µs": {
+   "nocompact": {
+    "mean": 26,
+    "ci": 10
+   },
+   "compact": {
+    "mean": 101,
+    "ci": 17
+   },
+   "guard": {
+    "mean": 58,
+    "ci": 11
+   },
+   "eevdf": {
+    "mean": 27,
+    "ci": 18
+   }
+  },
+  "ctxsw/s": {
+   "nocompact": {
+    "mean": 2418,
+    "ci": 284
+   },
+   "compact": {
+    "mean": 2354,
+    "ci": 235
+   },
+   "guard": {
+    "mean": 2477,
+    "ci": 262
+   },
+   "eevdf": {
+    "mean": 2362,
+    "ci": 305
+   }
+  },
+  "timer+resched irq/s": {
+   "nocompact": {
+    "mean": 7380,
+    "ci": 149
+   },
+   "compact": {
+    "mean": 7139,
+    "ci": 217
+   },
+   "guard": {
+    "mean": 7150,
+    "ci": 224
+   },
+   "eevdf": {
+    "mean": 6633,
+    "ci": 183
+   }
+  },
+  "idle CPU-s": {
+   "nocompact": {
+    "mean": 18.8,
+    "ci": 0.83
+   },
+   "compact": {
+    "mean": 18.96,
+    "ci": 0.92
+   },
+   "guard": {
+    "mean": 19.28,
+    "ci": 0.98
+   },
+   "eevdf": {
+    "mean": 20.35,
+    "ci": 1.19
+   }
+  },
+  "E_proxy (model)": {
+   "nocompact": {
+    "mean": 35.27,
+    "ci": 5.52
+   },
+   "compact": {
+    "mean": 32.51,
+    "ci": 5.33
+   },
+   "guard": {
+    "mean": 33.41,
+    "ci": 5.25
+   },
+   "eevdf": {
+    "mean": 35.47,
+    "ci": 5.45
+   }
+  }
+ },
+ "99": {
+  "CPUs used (≥10 % busy)": {
+   "nocompact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "guard": {
+    "mean": 8,
+    "ci": 0
+   },
+   "eevdf": {
+    "mean": 8,
+    "ci": 0
+   }
+  },
+  "CPUs parked (<1 % busy)": {
+   "nocompact": {
+    "mean": 0,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 0,
+    "ci": 0
+   },
+   "guard": {
+    "mean": 0,
+    "ci": 0
+   },
+   "eevdf": {
+    "mean": 0,
+    "ci": 0
+   }
+  },
+  "active set (mean)": {
+   "nocompact": {
+    "mean": 8,
+    "ci": 0
+   },
+   "compact": {
+    "mean": 7.8,
+    "ci": 0.05
+   },
+   "guard": {
+    "mean": 7.77,
+    "ci": 0.09
+   },
+   "eevdf": {
+    "mean": 8,
+    "ci": 0
+   }
+  },
+  "slowdown (wall / ideal)": {
+   "nocompact": {
+    "mean": 1.3526,
+    "ci": 0.2319
+   },
+   "compact": {
+    "mean": 1.2939,
+    "ci": 0.2349
+   },
+   "guard": {
+    "mean": 1.2855,
+    "ci": 0.2412
+   },
+   "eevdf": {
+    "mean": 1.297,
+    "ci": 0.2278
+   }
+  },
+  "dutywork wake p95 µs": {
+   "nocompact": {
+    "mean": 275,
+    "ci": 27
+   },
+   "compact": {
+    "mean": 369,
+    "ci": 99
+   },
+   "guard": {
+    "mean": 275,
+    "ci": 26
+   },
+   "eevdf": {
+    "mean": 260,
+    "ci": 18
+   }
+  },
+  "dutywork wake p99 µs": {
+   "nocompact": {
+    "mean": 373,
+    "ci": 55
+   },
+   "compact": {
+    "mean": 1551,
+    "ci": 580
+   },
+   "guard": {
+    "mean": 644,
+    "ci": 213
+   },
+   "eevdf": {
+    "mean": 324,
+    "ci": 34
+   }
+  },
+  "work-phase p99 ms": {
+   "nocompact": {
+    "mean": 37.96,
+    "ci": 6.19
+   },
+   "compact": {
+    "mean": 36.86,
+    "ci": 6.17
+   },
+   "guard": {
+    "mean": 36.56,
+    "ci": 6.42
+   },
+   "eevdf": {
+    "mean": 36.07,
+    "ci": 6.53
+   }
+  },
+  "probe p95 µs": {
+   "nocompact": {
+    "mean": 2577,
+    "ci": 293
+   },
+   "compact": {
+    "mean": 2537,
+    "ci": 289
+   },
+   "guard": {
+    "mean": 2444,
+    "ci": 283
+   },
+   "eevdf": {
+    "mean": 125,
+    "ci": 10
+   }
+  },
+  "probe p99 µs": {
+   "nocompact": {
+    "mean": 3439,
+    "ci": 258
+   },
+   "compact": {
+    "mean": 3354,
+    "ci": 236
+   },
+   "guard": {
+    "mean": 3274,
+    "ci": 283
+   },
+   "eevdf": {
+    "mean": 1046,
+    "ci": 581
+   }
+  },
+  "runqueue wait/slice µs": {
+   "nocompact": {
+    "mean": 425,
+    "ci": 40
+   },
+   "compact": {
+    "mean": 496,
+    "ci": 32
+   },
+   "guard": {
+    "mean": 456,
+    "ci": 44
+   },
+   "eevdf": {
+    "mean": 16,
+    "ci": 1
+   }
+  },
+  "ctxsw/s": {
+   "nocompact": {
+    "mean": 1476,
+    "ci": 248
+   },
+   "compact": {
+    "mean": 1550,
+    "ci": 252
+   },
+   "guard": {
+    "mean": 1552,
+    "ci": 257
+   },
+   "eevdf": {
+    "mean": 2198,
+    "ci": 338
+   }
+  },
+  "timer+resched irq/s": {
+   "nocompact": {
+    "mean": 8417,
+    "ci": 137
+   },
+   "compact": {
+    "mean": 8334,
+    "ci": 98
+   },
+   "guard": {
+    "mean": 8322,
+    "ci": 127
+   },
+   "eevdf": {
+    "mean": 8341,
+    "ci": 162
+   }
+  },
+  "idle CPU-s": {
+   "nocompact": {
+    "mean": 3.63,
+    "ci": 0.63
+   },
+   "compact": {
+    "mean": 3.88,
+    "ci": 0.59
+   },
+   "guard": {
+    "mean": 4.07,
+    "ci": 0.75
+   },
+   "eevdf": {
+    "mean": 5.18,
+    "ci": 0.96
+   }
+  },
+  "E_proxy (model)": {
+   "nocompact": {
+    "mean": 53.82,
+    "ci": 9.23
+   },
+   "compact": {
+    "mean": 51.05,
+    "ci": 9.34
+   },
+   "guard": {
+    "mean": 51.02,
+    "ci": 9.45
+   },
+   "eevdf": {
+    "mean": 51.99,
+    "ci": 9.11
+   }
+  }
+ }
+}

@@ -25,13 +25,21 @@ last changed this file.
 | A15 | Tail-latency cost at 40 % load | Verified (3 reps) | same report: wake p99 377 → 2460 µs; runqueue wait/slice 7 → 247 µs |
 | A16 | Sweep trends | Indicative (2 reps) | `results/processed/sweep_20260924T100355Z.md` |
 | A17 | Steady-state ctxsw is not raised by compaction | Verified (2 reps) | `results/processed/ctxsw_20260924T100950Z.md` |
+| A18 | Root cause of the 40 % tail latency identified | Verified (analysis of existing data) | `docs/NEXT_PHASE_DECISION.md` §1 |
+| A19 | Latency guard implemented, default behaviour unchanged | Verified | commit `958b081`; functional 12/12 `results/processed/functional_20260924T111109Z.md` |
+| A20 | Compaction CPU reduction holds at n = 10 | Verified (paired CI) | `results/processed/bench_repeated_20260924T111310Z.md` |
+| A21 | Compaction has a clear latency cost at 20/40 % (supersedes A15 and the 20 % part of A13–A14) | Verified (paired CI) | same |
+| A22 | Guard reduces that cost to ≤ +0.14 ms p99 vs EEVDF while keeping −2.0/−0.8 CPUs | Verified (paired CI) | same |
+| A23 | Full-load latency penalty is a base-policy cost (the `-n` control shows it too) | Verified (paired CI) | same, 99 % duty |
 
 ## Open or unverified items
 
 | # | Item | Status |
 |---|---|---|
 | U1 | +25 % context switches at N=8 with stress-ng (row 18) | Partly explained: sched_ext start-up transient (A17); the rest is unexplained |
-| U2 | Latency on a realistic latency-sensitive workload | Not measured (synthetic dutywork only) |
+| U2 | Latency on a realistic application workload | Not measured (synthetic dutywork + latprobe only) |
 | U3 | Energy | **Not measured**: no RAPL or cpuidle in WSL2/QEMU. Only a coefficient-based proxy (0.64/0.86/0.94) is reported |
-| U4 | Statistical confidence | 2–3 reps, min/max only; the 40 % p99 varies ~2× between runs |
-| U5 | Retuned defaults | Not done on purpose; the sweep has too few reps |
+| U4 | Statistical confidence | Resolved for the main matrix (n = 10, paired CIs); the sweep is still 2 reps |
+| U5 | Retuned defaults / guard default-on | Not done on purpose; the guard stays opt-in |
+| U6 | Full-load base-policy latency (+2.2–2.4 ms p99) | Observed and measured, not addressed |
+| U7 | scx_lavd comparison | Not feasible in this environment yet |

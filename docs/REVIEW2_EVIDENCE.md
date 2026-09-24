@@ -1,16 +1,21 @@
 # Review-2 Evidence: scx_compact (BCSE303P)
 
+> The authoritative Review-2 report is `docs/REVIEW2_FINAL.md`. This file maps claims to
+> artifacts. E10–E14 are preliminary (2–3 reps); E15–E19 (n = 10) supersede them where they conflict.
+
 Each item gives the claim, the artifact and how to reproduce it. Numbers: `docs/RESULTS_SUMMARY.md`.
 
 ## What was built (original work)
 | Component | File | Size |
 |---|---|---|
-| BPF sched_ext policy: active CPU set, shared vtime DSQ, pinned-task escape, EWMA controller with expand/shrink hysteresis | `scheduler/scx_compact.bpf.c` | 368 lines |
-| Userspace loader: topology-based CPU order, tunables, CSV telemetry | `scheduler/scx_compact.c`, `scx_compact.h` | 286 + 32 lines |
+| BPF sched_ext policy: active CPU set, shared vtime DSQ, pinned-task escape, EWMA controller with expand/shrink hysteresis, latency guard | `scheduler/scx_compact.bpf.c` | 473 lines |
+| Userspace loader: topology-based CPU order, tunables, CSV telemetry | `scheduler/scx_compact.c`, `scx_compact.h` | 294 + 36 lines |
 | Guest kernel config and build with a disk guard | `vm/scx-guest.config`, `vm/build_kernel.sh` | |
 | KVM test VM (host root over 9p, job runner) | `vm/run_vm.sh`, `vm/guest_init.sh` | |
 | Functional suite F1–F6 with independent `/proc/stat` checking | `tests/vm_functional.sh`, `tests/analyze_functional.py` | |
-| Fixed-work duty-cycle workload with latency percentiles | `tests/dutywork.c` | 160 lines |
+| Fixed-work duty-cycle workload with latency percentiles | `tests/dutywork.c` | 161 lines |
+| Latency probe (1 ms periodic sleeper) | `tests/latprobe.c` | 64 lines |
+| Repeated interleaved validation + paired-bootstrap analysis | `tests/vm_bench_repeated.sh`, `tests/analyze_repeated.py` | |
 | Partial-load benchmark, sweep, ctxsw check and analyzers | `tests/vm_bench_partial.sh`, `vm_sweep.sh`, `vm_ctxsw.sh`, `analyze_partial.py`, `analyze_ctxsw.py` | |
 
 Built on: the in-tree `tools/sched_ext` build system and headers (Linux 6.18.53). The policy
@@ -33,21 +38,19 @@ structure follows `scx_simple` (vtime ordering). The compaction, controller and 
 | E12 | Sweep trends (shrink threshold, averaging, queue hold) | `results/processed/sweep_20260924T100355Z.md` | `vm/run_vm.sh tests/vm_sweep.sh 8 3G` |
 | E13 | Extra ctxsw is sched_ext start-up, not steady-state compaction | `results/processed/ctxsw_20260924T100950Z.md` | `vm/run_vm.sh tests/vm_ctxsw.sh 8 3G` |
 | E14 | Energy **proxy** ratio 0.64/0.86/0.94 (model, not measurement) | E10 report footer; definition in `tests/analyze_partial.py` | as E10 |
+| E15 | Root cause of the 40 % tail latency: sizing rule leaves 4 CPUs for 3.1 CPUs of bursty demand | `docs/NEXT_PHASE_DECISION.md` §1 | per-rep windows of `results/raw/bench_partial/20260924T095946Z/compact.csv` |
+| E16 | Latency guard implemented; functional suite still 12/12 | `scheduler/scx_compact.bpf.c`; `results/processed/functional_20260924T111109Z.md`; commit `958b081` | `vm/run_vm.sh tests/vm_functional.sh 8 3G` |
+| E17 | n = 10: compaction −3.0/−2.4/−1.1 CPUs; probe p99 +2.9/+1.4 ms at 20/40 % | `results/processed/bench_repeated_20260924T111310Z.md` (paired table) | `vm/run_vm.sh tests/vm_bench_repeated.sh 8 3G` then `analyze_repeated.py` |
+| E18 | n = 10: guard −2.0/−0.8 CPUs with probe p99 +0.14/+0.06 ms vs EEVDF at 20/40 % | same | same |
+| E19 | Full-load latency penalty is shared by the `-n` control (base-policy cost) | same, duty 99 % | same |
 
 ## Limitations to state at the review
 1. **No energy measurement.** WSL2/QEMU exposes no RAPL or cpuidle, so only a coefficient-based proxy is reported.
 2. **VM, not bare metal.** vCPUs are host threads, and "parked" guest CPUs do not map to host C-states.
-3. **Small samples.** 2–3 reps with min/max only. p99 varies about 2× between runs.
+3. **Host drift.** Per-rep mean slowdown ranged 0.95–1.34 in the n = 10 run; only paired comparisons are reliable. The E10–E14 preliminary results have 2–3 reps.
 4. **Synthetic workloads only** (busy loops, stress-ng, dutywork).
 5. The +25 % context switches at N=8 with stress-ng are not fully explained.
 6. `scx_simple` could not be built on 6.18.53 (kfunc mismatch), so `scx_qmap` is the reference scheduler.
 
 ## Remaining work for the final project
-1. More repetitions (≥ 10) with confidence intervals for the partial-load matrix.
-2. A realistic latency-sensitive workload (e.g. `schbench`, or a request/response server) alongside dutywork.
-3. Decide the defaults from a repeated sweep (candidates: shrink 65 %, queue hold 1).
-4. Compare against an existing sched_ext scheduler with a power-saving mode (e.g. scx_lavd,
-   see `docs/RESEARCH_DECISION.md`), if it builds for 6.18.
-5. If bare-metal Linux with RAPL is available, measure energy directly; otherwise keep the proxy clearly labelled.
-6. `-o smt` vs `-o core` ordering comparison (implemented, not yet evaluated).
-7. Final report and demo script.
+See `docs/NEXT_PHASE_RESULTS.md` §7 and `docs/REVIEW2_FINAL.md` §8.

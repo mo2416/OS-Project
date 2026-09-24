@@ -22,8 +22,8 @@
 const char help_fmt[] =
 "scx_compact: load-adaptive core-compaction scheduler (sched_ext)\n"
 "\n"
-"Usage: %s [-m MIN] [-M MAX] [-e PCT] [-s PCT] [-H N] [-w SHIFT] [-Q N] [-i MS] [-S US]\n"
-"          [-o smt|core|linear] [-n] [-p MS] [-c FILE] [-t SEC] [-v]\n"
+"Usage: %s [-m MIN] [-M MAX] [-e PCT] [-s PCT] [-H N] [-w SHIFT] [-Q N] [-L US] [-P PM]\n"
+"          [-i MS] [-S US] [-o smt|core|linear] [-n] [-p MS] [-c FILE] [-t SEC] [-v]\n"
 "\n"
 "  -m MIN    minimum active CPUs (default 2)\n"
 "  -M MAX    maximum active CPUs (default: all)\n"
@@ -32,6 +32,9 @@ const char help_fmt[] =
 "  -H N      consecutive low ticks required before shrinking (default 5)\n"
 "  -w SHIFT  demand EWMA weight 1/2^SHIFT (default 3; 0 = raw per-tick demand)\n"
 "  -Q N      ticks of sustained queueing before a queue-driven expand (default 2)\n"
+"  -L US     latency guard: add a CPU when more than PM per mille of shared-queue\n"
+"            waits exceed US microseconds (default 0 = guard off)\n"
+"  -P PM     latency guard tolerance in per mille (default 10, i.e. a p99 target)\n"
 "  -i MS     controller interval in ms (default 20)\n"
 "  -S US     time slice in us (default 5000)\n"
 "  -o ORDER  CPU preference order: smt = fill SMT siblings of a core first\n"
@@ -156,7 +159,7 @@ int main(int argc, char **argv)
 	skel->rodata->min_active = nr_cpus < 2 ? nr_cpus : 2;
 	skel->rodata->max_active = nr_cpus;
 
-	while ((opt = getopt(argc, argv, "m:M:e:s:H:w:Q:i:S:o:np:c:t:vh")) != -1) {
+	while ((opt = getopt(argc, argv, "m:M:e:s:H:w:Q:L:P:i:S:o:np:c:t:vh")) != -1) {
 		switch (opt) {
 		case 'm': skel->rodata->min_active = atoi(optarg); break;
 		case 'M': skel->rodata->max_active = atoi(optarg); break;
@@ -165,6 +168,8 @@ int main(int argc, char **argv)
 		case 'H': skel->rodata->shrink_hold = atoi(optarg); break;
 		case 'w': skel->rodata->ewma_shift = atoi(optarg); break;
 		case 'Q': skel->rodata->queue_hold = atoi(optarg); break;
+		case 'L': skel->rodata->lat_ns = strtoull(optarg, NULL, 0) * 1000ULL; break;
+		case 'P': skel->rodata->late_target_pm = atoi(optarg); break;
 		case 'i': skel->rodata->interval_ns = strtoull(optarg, NULL, 0) * 1000000ULL; break;
 		case 'S': skel->rodata->slice_ns = strtoull(optarg, NULL, 0) * 1000ULL; break;
 		case 'o': order_mode = optarg; break;
@@ -198,11 +203,12 @@ int main(int argc, char **argv)
 		((__u32 *)skel->rodata->cpu_rank)[skel->rodata->cpu_order[i]] = i;
 
 	printf("scx_compact: cpus=%d compact=%d min=%u max=%u expand=%u%% shrink=%u%% "
-	       "hold=%u ewma_shift=%u queue_hold=%u interval=%llums slice=%lluus order=%s:",
+	       "hold=%u ewma_shift=%u queue_hold=%u lat_us=%llu late_pm=%u interval=%llums slice=%lluus order=%s:",
 	       nr_cpus, skel->rodata->compact_enabled, skel->rodata->min_active,
 	       skel->rodata->max_active, skel->rodata->expand_pct,
 	       skel->rodata->shrink_pct, skel->rodata->shrink_hold,
 	       skel->rodata->ewma_shift, skel->rodata->queue_hold,
+	       (unsigned long long)skel->rodata->lat_ns / 1000, skel->rodata->late_target_pm,
 	       (unsigned long long)skel->rodata->interval_ns / 1000000,
 	       (unsigned long long)skel->rodata->slice_ns / 1000,
 	       order_mode);
@@ -221,7 +227,7 @@ int main(int argc, char **argv)
 			exit_req = 1;
 		} else {
 			fprintf(csv, "mono_s,t_s,nr_active,util_pct,demand_pct,queued,nr_ticks,nr_expand,nr_shrink,"
-				"nr_local,nr_shared,nr_pinned,cpus_busy");
+				"nr_local,nr_shared,nr_pinned,nr_waits,nr_late,late_pm,nr_lat_expand,cpus_busy");
 			for (i = 0; i < nr_cpus; i++)
 				fprintf(csv, ",cpu%d_pct", i);
 			fprintf(csv, "\n");
@@ -250,20 +256,22 @@ int main(int argc, char **argv)
 				busy_cpus++;
 		}
 
-		printf("t=%6.1fs active=%2llu util=%3llu%% demand=%4llu%% queued=%3llu expand=%llu "
-		       "shrink=%llu busy_cpus(>=5%%)=%2d |", t - t0, g->nr_active, g->util_pct,
-		       g->demand_pct, g->queued,
-		       g->nr_expand, g->nr_shrink, busy_cpus);
+		printf("t=%6.1fs active=%2llu util=%3llu%% demand=%4llu%% queued=%3llu late=%3llu%%o "
+		       "expand=%llu lat_expand=%llu shrink=%llu busy_cpus(>=5%%)=%2d |", t - t0,
+		       g->nr_active, g->util_pct, g->demand_pct, g->queued, g->late_pm,
+		       g->nr_expand, g->nr_lat_expand, g->nr_shrink, busy_cpus);
 		for (i = 0; i < nr_cpus; i++)
 			printf(" %3.0f", pct[i]);
 		printf("\n");
 		fflush(stdout);
 
 		if (csv) {
-			fprintf(csv, "%.3f,%.3f,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%d",
+			fprintf(csv, "%.3f,%.3f,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,"
+				"%llu,%llu,%llu,%llu,%d",
 				t, t - t0, g->nr_active, g->util_pct, g->demand_pct, g->queued, g->nr_ticks,
 				g->nr_expand, g->nr_shrink, g->nr_local, g->nr_shared,
-				g->nr_pinned, busy_cpus);
+				g->nr_pinned, g->nr_waits, g->nr_late, g->late_pm, g->nr_lat_expand,
+				busy_cpus);
 			for (i = 0; i < nr_cpus; i++)
 				fprintf(csv, ",%.1f", pct[i]);
 			fprintf(csv, "\n");

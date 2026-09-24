@@ -31,7 +31,7 @@ record_env
 export DUTYWORK_LOOPS_PER_MS=$("$DW" -c)
 { echo "suite: $SUITE"; echo "workers: $WORKERS duties: $DUTIES period_ms: $PERIOD_MS iters: $ITERS reps: $REPS"
   echo "loops_per_ms: $DUTYWORK_LOOPS_PER_MS"; echo "configs: $CONFIGS"; } >> "$OUT/env.txt"
-echo "cond,duty,rep,wall_s,ideal_s,slowdown,work_ms,run_p50_ms,run_p99_ms,wake_p50_us,wake_p99_us,wake_max_us" > "$OUT/runs.csv"
+echo "cond,duty,rep,wall_s,ideal_s,slowdown,work_ms,run_p50_ms,run_p99_ms,wake_p50_us,wake_p99_us,wake_max_us,run_p95_ms,wake_p95_us" > "$OUT/runs.csv"
 
 for cfg in $CONFIGS; do
   name=${cfg%%:*}; args=""

@@ -21,6 +21,20 @@
  *           at <= shrink_pct % utilization with an empty queue, for
  *           shrink_hold consecutive ticks  (hysteresis: slow to release)
  *
+ * Latency guard (optional, lat_ns > 0): utilization alone cannot see
+ * burstiness, so a set sized for 80 % utilization can still queue tasks for
+ * milliseconds. The guard measures the delay the policy itself causes: time
+ * spent in the shared queue because no idle active CPU was free (insert into
+ * SHARED_DSQ -> ops.running). Samples are all dispatches of tasks that may
+ * run on every CPU; a task placed directly on an idle CPU counts as "not
+ * late". Affinity-restricted tasks are excluded, because more active CPUs
+ * cannot shorten their waits. The controller keeps a decayed (1/2^LAT_SHIFT)
+ * fraction of late samples (wait > lat_ns). If it exceeds late_target_pm per
+ * mille, i.e. the estimated (1000 - late_target_pm)/1000 quantile of
+ * policy-induced delay is above lat_ns, one CPU is added and the guard pauses
+ * for LAT_COOLDOWN ticks. Shrinking is blocked while the fraction is above
+ * half the target; recovery then uses the normal shrink hysteresis.
+ *
  * Scheduling order inside the set is weighted vtime (as in scx_simple).
  * Tasks whose affinity excludes every active CPU (e.g. per-CPU kthreads) are
  * dispatched directly to a CPU they may run on, so compaction never starves
@@ -54,6 +68,8 @@ const volatile u32 shrink_hold = 5;
 const volatile u32 ewma_shift = 3;		/* 0 = no smoothing */
 const volatile u32 queue_hold = 2;		/* ticks of sustained queueing */
 const volatile u64 slice_ns = 5ULL * 1000 * 1000;
+const volatile u64 lat_ns = 0;			/* latency guard target; 0 = off */
+const volatile u32 late_target_pm = 10;		/* tolerated late waits, per mille */
 
 /* Controller state; stats.nr_active is the authoritative active-set size. */
 struct cc_global stats;
@@ -64,6 +80,38 @@ static u32 queue_streak;
 static u64 demand;		/* smoothed demand, in CPUs x DEMAND_ONE */
 
 #define DEMAND_ONE	1024
+
+/* Latency guard state: decayed wait counts (weight 1/2^LAT_SHIFT per tick). */
+#define LAT_SHIFT	3
+#define LAT_MIN_WAITS	64	/* ignore the guard with too few samples */
+#define LAT_COOLDOWN	(1U << LAT_SHIFT)	/* ticks between guard expansions */
+static u64 waits_prev, late_prev, waits_acc, late_acc;
+static u32 lat_cooldown;
+
+struct task_ctx {
+	u64	enq_ts;		/* when it entered the shared queue (0 = not queued) */
+};
+
+struct {
+	__uint(type, BPF_MAP_TYPE_TASK_STORAGE);
+	__uint(map_flags, BPF_F_NO_PREALLOC);
+	__type(key, int);
+	__type(value, struct task_ctx);
+} task_ctxs SEC(".maps");
+
+/*
+ * Shared-queue wait: starts when ops.enqueue() puts the task in SHARED_DSQ and
+ * ends in ops.running. It is cancelled in ops.quiescent (the task left the
+ * runqueue without running, e.g. it was dequeued), so no stale timestamp is
+ * ever measured.
+ */
+void BPF_STRUCT_OPS(compact_quiescent, struct task_struct *p, u64 deq_flags)
+{
+	struct task_ctx *t = bpf_task_storage_get(&task_ctxs, p, 0, 0);
+
+	if (t)
+		t->enq_ts = 0;
+}
 
 UEI_DEFINE(uei);
 
@@ -169,6 +217,7 @@ s32 BPF_STRUCT_OPS(compact_select_cpu, struct task_struct *p, s32 prev_cpu,
 void BPF_STRUCT_OPS(compact_enqueue, struct task_struct *p, u64 enq_flags)
 {
 	u64 vtime = p->scx.dsq_vtime;
+	struct task_ctx *t;
 	s32 cpu;
 
 	if (!task_fits_active(p)) {
@@ -189,6 +238,14 @@ void BPF_STRUCT_OPS(compact_enqueue, struct task_struct *p, u64 enq_flags)
 		vtime = vtime_now - slice_ns;
 
 	__sync_fetch_and_add(&stats.nr_shared, 1);
+	/*
+	 * Guard input: only tasks that may run on every CPU. The wait of an
+	 * affinity-restricted task (e.g. a per-CPU kthread behind a busy CPU)
+	 * cannot be shortened by activating more CPUs.
+	 */
+	t = bpf_task_storage_get(&task_ctxs, p, 0, 0);
+	if (t && p->nr_cpus_allowed >= nr_cpus)
+		t->enq_ts = bpf_ktime_get_ns();
 	scx_bpf_dsq_insert_vtime(p, SHARED_DSQ, slice_ns, vtime, enq_flags);
 
 	/* Wake an idle CPU that is allowed to pull from the shared queue. */
@@ -211,9 +268,26 @@ void BPF_STRUCT_OPS(compact_running, struct task_struct *p)
 {
 	struct cc_cpu *c = cpu_ctx(scx_bpf_task_cpu(p));
 
+	struct task_ctx *t = bpf_task_storage_get(&task_ctxs, p, 0, 0);
+	u64 now = bpf_ktime_get_ns();
+
 	if (c) {
-		c->run_start = bpf_ktime_get_ns();
+		c->run_start = now;
 		c->nr_started++;
+	}
+	/*
+	 * Guard sample: every dispatch of an unrestricted task. A task placed
+	 * directly on an idle CPU had no policy-induced delay; one that came from
+	 * the shared queue is late if it waited there longer than lat_ns. The late
+	 * fraction therefore estimates a quantile of policy-induced delay over all
+	 * dispatches (all modes, so the -n control reports it too).
+	 */
+	if (p->nr_cpus_allowed >= nr_cpus)
+		__sync_fetch_and_add(&stats.nr_waits, 1);
+	if (t && t->enq_ts) {
+		if (now > t->enq_ts && lat_ns && now - t->enq_ts > lat_ns)
+			__sync_fetch_and_add(&stats.nr_late, 1);
+		t->enq_ts = 0;
 	}
 	/* Global vtime progresses as tasks start (racy, as in scx_simple). */
 	if (time_before(vtime_now, p->scx.dsq_vtime))
@@ -239,6 +313,14 @@ void BPF_STRUCT_OPS(compact_stopping, struct task_struct *p, bool runnable)
 	p->scx.dsq_vtime += scale_by_task_weight_inverse(p, slice_ns - p->scx.slice);
 }
 
+s32 BPF_STRUCT_OPS(compact_init_task, struct task_struct *p,
+		   struct scx_init_task_args *args)
+{
+	if (bpf_task_storage_get(&task_ctxs, p, 0, BPF_LOCAL_STORAGE_GET_F_CREATE))
+		return 0;
+	return -ENOMEM;
+}
+
 void BPF_STRUCT_OPS(compact_enable, struct task_struct *p)
 {
 	p->scx.dsq_vtime = vtime_now;
@@ -252,6 +334,7 @@ static int ctl_timerfn(void *map, int *key, struct bpf_timer *timer)
 {
 	u64 now = bpf_ktime_get_ns(), busy = 0, elapsed, cap, queued, inst, need;
 	u32 cpu, n = stats.nr_active, old_n = n, step;
+	bool lat_bad, lat_ok;
 
 	bpf_for(cpu, 0, nr_cpus) {
 		struct cc_cpu *c = cpu_ctx(cpu);
@@ -288,6 +371,20 @@ static int ctl_timerfn(void *map, int *key, struct bpf_timer *timer)
 	stats.demand_pct = demand * 100 / DEMAND_ONE;
 	queue_streak = queued >= n ? queue_streak + 1 : 0;
 
+	/*
+	 * Latency guard input: decayed fraction of late samples, in fixed point
+	 * (x1024) so that small counts still decay to zero.
+	 */
+	waits_acc = waits_acc - (waits_acc >> LAT_SHIFT) + ((stats.nr_waits - waits_prev) << 10);
+	late_acc = late_acc - (late_acc >> LAT_SHIFT) + ((stats.nr_late - late_prev) << 10);
+	waits_prev = stats.nr_waits;
+	late_prev = stats.nr_late;
+	stats.late_pm = waits_acc ? late_acc * 1000 / waits_acc : 0;
+	lat_bad = lat_ns && waits_acc >= (LAT_MIN_WAITS << 10) && stats.late_pm > late_target_pm;
+	lat_ok = !lat_ns || stats.late_pm * 2 <= late_target_pm;
+	if (lat_cooldown)
+		lat_cooldown--;
+
 	if (compact_enabled) {
 		if (demand * 100 > (u64)expand_pct * DEMAND_ONE * n) {
 			/* Smallest set that keeps demand under expand_pct. */
@@ -299,7 +396,13 @@ static int ctl_timerfn(void *map, int *key, struct bpf_timer *timer)
 			n = n + step > max_active ? max_active : n + step;
 			queue_streak = 0;
 			low_streak = 0;
-		} else if (n > min_active && queued == 0 &&
+		} else if (lat_bad && !lat_cooldown && n < max_active) {
+			/* Latency guard: queueing delay over target, add one CPU. */
+			n++;
+			lat_cooldown = LAT_COOLDOWN;
+			stats.nr_lat_expand++;
+			low_streak = 0;
+		} else if (n > min_active && queued == 0 && lat_ok &&
 			   demand * 100 <= (u64)shrink_pct * DEMAND_ONE * (n - 1)) {
 			if (++low_streak >= shrink_hold) {
 				n--;
@@ -362,6 +465,8 @@ SCX_OPS_DEFINE(compact_ops,
 	       .dispatch		= (void *)compact_dispatch,
 	       .running			= (void *)compact_running,
 	       .stopping		= (void *)compact_stopping,
+	       .init_task		= (void *)compact_init_task,
+	       .quiescent		= (void *)compact_quiescent,
 	       .enable			= (void *)compact_enable,
 	       .init			= (void *)compact_init,
 	       .exit			= (void *)compact_exit,

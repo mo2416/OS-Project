@@ -1,0 +1,6 @@
+[    9.917743] sched_ext: BPF scheduler "qmap" enabled
+[   12.100487] sched_ext: BPF scheduler "qmap" disabled (unregistered from user space)
+[   21.628925] sched_ext: BPF scheduler "compact" enabled
+[   66.895406] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[   67.270487] sched_ext: BPF scheduler "compact" enabled
+[   76.537452] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)

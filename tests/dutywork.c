@@ -25,6 +25,7 @@
  *              (= work_ms + time spent preempted / waiting for a CPU)
  *   wake_p50_us/wake_p99_us/wake_max_us  wakeup lateness: actual sleep minus
  *              the requested sleep
+ *   run_p95_ms/wake_p95_us  the same at p95 (appended last to keep column order)
  */
 #define _GNU_SOURCE
 #include <pthread.h>
@@ -150,11 +151,11 @@ int main(int argc, char **argv)
 	qsort(run_ns, n, sizeof(*run_ns), cmp_u64);
 	qsort(wake_ns, n, sizeof(*wake_ns), cmp_u64);
 	printf("wall_s=%.3f ideal_s=%.3f slowdown=%.4f work_ms=%.3f run_p50_ms=%.3f run_p99_ms=%.3f "
-	       "wake_p50_us=%.1f wake_p99_us=%.1f wake_max_us=%.1f\n",
+	       "wake_p50_us=%.1f wake_p99_us=%.1f wake_max_us=%.1f run_p95_ms=%.3f wake_p95_us=%.1f\n",
 	       t / 1e9, (double)iters * period_ms / 1e3,
 	       t / 1e9 / ((double)iters * period_ms / 1e3), work_ns / 1e6,
 	       pct(run_ns, n, 0.50) / 1e6, pct(run_ns, n, 0.99) / 1e6,
 	       pct(wake_ns, n, 0.50) / 1e3, pct(wake_ns, n, 0.99) / 1e3,
-	       wake_ns[n - 1] / 1e3);
+	       wake_ns[n - 1] / 1e3, pct(run_ns, n, 0.95) / 1e6, pct(wake_ns, n, 0.95) / 1e3);
 	return 0;
 }

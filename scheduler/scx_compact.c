@@ -212,7 +212,7 @@ int main(int argc, char **argv)
 			perror("csv");
 			exit_req = 1;
 		} else {
-			fprintf(csv, "t_s,nr_active,util_pct,queued,nr_ticks,nr_expand,nr_shrink,"
+			fprintf(csv, "mono_s,t_s,nr_active,util_pct,queued,nr_ticks,nr_expand,nr_shrink,"
 				"nr_local,nr_shared,nr_pinned,cpus_busy");
 			for (i = 0; i < nr_cpus; i++)
 				fprintf(csv, ",cpu%d_pct", i);
@@ -251,8 +251,8 @@ int main(int argc, char **argv)
 		fflush(stdout);
 
 		if (csv) {
-			fprintf(csv, "%.3f,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%d",
-				t - t0, g->nr_active, g->util_pct, g->queued, g->nr_ticks,
+			fprintf(csv, "%.3f,%.3f,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu,%d",
+				t, t - t0, g->nr_active, g->util_pct, g->queued, g->nr_ticks,
 				g->nr_expand, g->nr_shrink, g->nr_local, g->nr_shared,
 				g->nr_pinned, busy_cpus);
 			for (i = 0; i < nr_cpus; i++)

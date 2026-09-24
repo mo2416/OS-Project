@@ -10,12 +10,13 @@ DUTY="stress-ng --cpu 8 --cpu-load 20 --timeout"   # 8 workers, each busy 20% of
 record_env
 mark "run:start"
 
-# --- F1: sched_ext baseline with the in-tree reference scheduler -----------------------
-"$BIN/scx_simple" > "$OUT/simple.log" 2>&1 &
+# --- F1: sched_ext baseline with the in-tree reference scheduler (scx_qmap; scx_simple
+# does not build on 6.18.53, see scheduler/Makefile) ------------------------------------
+"$BIN/scx_qmap" > "$OUT/qmap.log" 2>&1 &
 SPID=$!
-wait_state enabled && echo "simple_state_during: $(scx_state) ops=$(scx_ops)" >> "$OUT/states.txt"
-sleep 2; kill -INT $SPID; wait $SPID; echo "simple_exit: $?" >> "$OUT/states.txt"
-wait_state disabled; echo "simple_state_after: $(scx_state)" >> "$OUT/states.txt"
+wait_state enabled && echo "qmap_state_during: $(scx_state) ops=$(scx_ops)" >> "$OUT/states.txt"
+sleep 2; kill -INT $SPID; wait $SPID; echo "qmap_exit: $?" >> "$OUT/states.txt"
+wait_state disabled; echo "qmap_state_after: $(scx_state)" >> "$OUT/states.txt"
 
 # --- F4 reference: duty-cycle load under the default scheduler (EEVDF) -----------------
 $DUTY 9s > /dev/null 2>&1 & W=$!

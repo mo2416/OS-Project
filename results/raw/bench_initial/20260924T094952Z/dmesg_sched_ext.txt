@@ -1,0 +1,4 @@
+[   40.282053] sched_ext: BPF scheduler "compact" enabled
+[   75.479670] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[   75.698047] sched_ext: BPF scheduler "compact" enabled
+[  110.453753] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)

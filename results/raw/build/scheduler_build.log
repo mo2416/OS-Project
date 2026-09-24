@@ -1,0 +1,18 @@
+make: Entering directory '/mnt/d/OS Project/scheduler'
+# cd instead of -C: tools/scripts/Makefile.include cd's to $PWD, which breaks on the
+# space in "OS Project".
+cd /home/asif/osproj-build/linux-6.18.53/tools/sched_ext && make O=/home/asif/osproj-build/scxbuild VMLINUX_BTF=/home/asif/osproj-build/kbuild/vmlinux \
+	c-sched-targets="scx_qmap scx_compact" /home/asif/osproj-build/scxbuild/build/bin/scx_qmap /home/asif/osproj-build/scxbuild/build/bin/scx_compact
+make[1]: Entering directory '/home/asif/osproj-build/linux-6.18.53/tools/sched_ext'
+Makefile:148: warning: overriding recipe for target '/home/asif/osproj-build/scxbuild/build/obj/libbpf/libbpf.a'
+Makefile:139: warning: ignoring old recipe for target '/home/asif/osproj-build/scxbuild/build/obj/libbpf/libbpf.a'
+make[1]: '/home/asif/osproj-build/scxbuild/build/bin/scx_qmap' is up to date.
+gcc -g -O2 -rdynamic -pthread -Wall -Werror  -I/home/asif/osproj-build/scxbuild/build/include -I/home/asif/osproj-build/linux-6.18.53/include/generated -I/home/asif/osproj-build/linux-6.18.53/tools/lib -I/home/asif/osproj-build/linux-6.18.53/tools/include -I/home/asif/osproj-build/linux-6.18.53/tools/include/uapi -I/home/asif/osproj-build/linux-6.18.53/tools/sched_ext/include -c scx_compact.c -o /home/asif/osproj-build/scxbuild/build/obj/sched_ext/scx_compact.o
+gcc -o /home/asif/osproj-build/scxbuild/build/bin/scx_compact /home/asif/osproj-build/scxbuild/build/obj/sched_ext/scx_compact.o /home/asif/osproj-build/scxbuild/build/obj/libbpf/libbpf.a -lelf -lz -lpthread
+make[1]: Leaving directory '/home/asif/osproj-build/linux-6.18.53/tools/sched_ext'
+mkdir -p build && cp /home/asif/osproj-build/scxbuild/build/bin/scx_qmap /home/asif/osproj-build/scxbuild/build/bin/scx_compact build/
+total 2424
+-rwxrwxrwx 1 asif asif 1232568 Sep 24 09:47 scx_compact
+-rwxrwxrwx 1 asif asif 1248648 Sep 24 09:47 scx_qmap
+make: Leaving directory '/mnt/d/OS Project/scheduler'
+EXIT 0

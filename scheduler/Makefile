@@ -13,11 +13,15 @@ KOUT         ?= $(OSPROJ_BUILD)/kbuild
 SCXOUT       ?= $(OSPROJ_BUILD)/scxbuild
 HERE         := $(shell pwd)
 SRCS         := scx_compact.bpf.c scx_compact.c scx_compact.h
-TARGETS      := scx_simple scx_qmap scx_compact
+# scx_simple is not built: in the 6.18.53 tree it calls a kfunc 6.18 lacks.
+TARGETS      := scx_qmap scx_compact
 
 all:
 	@for f in $(SRCS); do ln -sf "$(HERE)/$$f" "$(KSRC)/tools/sched_ext/$$f"; done
-	$(MAKE) -C $(KSRC)/tools/sched_ext O=$(SCXOUT) VMLINUX_BTF=$(KOUT)/vmlinux \
+	@mkdir -p $(SCXOUT)
+	# cd instead of -C: tools/scripts/Makefile.include cd's to $$PWD, which breaks on the
+	# space in "OS Project".
+	cd $(KSRC)/tools/sched_ext && $(MAKE) O=$(SCXOUT) VMLINUX_BTF=$(KOUT)/vmlinux \
 		c-sched-targets="$(TARGETS)" $(addprefix $(SCXOUT)/build/bin/,$(TARGETS))
 	mkdir -p build && cp $(addprefix $(SCXOUT)/build/bin/,$(TARGETS)) build/
 	@ls -l build/

@@ -72,10 +72,10 @@ def main():
     env = (run / "env.txt").read_text()
     check("F1a", "sched_ext present in guest kernel",
           "sched_ext_state: absent" not in env, env.splitlines()[0] + ", " + env.splitlines()[2])
-    check("F1b", "scx_simple attaches and detaches cleanly",
-          states.get("simple_state_during", "").startswith("enabled ops=simple")
-          and states.get("simple_exit") == "0" and states.get("simple_state_after") == "disabled",
-          f"during=`{states.get('simple_state_during')}` exit={states.get('simple_exit')}")
+    check("F1b", "reference scheduler scx_qmap attaches and detaches cleanly",
+          states.get("qmap_state_during", "").startswith("enabled ops=qmap")
+          and states.get("qmap_exit") == "0" and states.get("qmap_state_after") == "disabled",
+          f"during=`{states.get('qmap_state_during')}` exit={states.get('qmap_exit')}")
     check("F2", "scx_compact attaches, runs all phases, exits cleanly",
           states.get("compact_state_during", "").startswith("enabled ops=compact")
           and states.get("compact_exit") == "0" and states.get("compact_state_after") == "disabled",

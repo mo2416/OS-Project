@@ -1,0 +1,9 @@
+qmap_state_during: enabled ops=qmap
+qmap_exit: 0
+qmap_state_after: disabled
+compact_state_during: enabled ops=compact
+compact_exit: 0
+compact_state_after: disabled
+nocompact_state_during: enabled ops=compact
+nocompact_exit: 0
+nocompact_state_after: disabled

@@ -7,13 +7,17 @@
  * CPUs outside the set never pull work from the shared queue, so they stay
  * idle and can enter deep idle states.
  *
- * A periodic BPF timer (the "controller") resizes the set:
+ * A periodic BPF timer (the "controller") resizes the set. Demand is the busy
+ * time of the last interval summed over all CPUs, smoothed with an EWMA of
+ * weight 1/2^ewma_shift (bursty loads would otherwise inflate the set on
+ * single 20 ms samples):
  *
- *   expand  if demand > expand_pct % of the active set's capacity, or if at
- *           least nr_active tasks are waiting in the shared queue;
- *           step = 1 + queued / 2  (fast reaction to contention)
+ *   expand  if smoothed demand > expand_pct % of the active set's capacity
+ *           (grow to the size that brings it back under expand_pct), or if
+ *           at least nr_active tasks have been waiting in the shared queue for
+ *           queue_hold consecutive ticks; step = 1 + queued / 2
  *
- *   shrink  by one CPU if the measured demand would fit in nr_active - 1 CPUs
+ *   shrink  by one CPU if the smoothed demand would fit in nr_active - 1 CPUs
  *           at <= shrink_pct % utilization with an empty queue, for
  *           shrink_hold consecutive ticks  (hysteresis: slow to release)
  *
@@ -47,6 +51,8 @@ const volatile u64 interval_ns = 20ULL * 1000 * 1000;
 const volatile u32 expand_pct = 80;
 const volatile u32 shrink_pct = 50;
 const volatile u32 shrink_hold = 5;
+const volatile u32 ewma_shift = 3;		/* 0 = no smoothing */
+const volatile u32 queue_hold = 2;		/* ticks of sustained queueing */
 const volatile u64 slice_ns = 5ULL * 1000 * 1000;
 
 /* Controller state; stats.nr_active is the authoritative active-set size. */
@@ -54,6 +60,10 @@ struct cc_global stats;
 static u64 vtime_now;
 static u64 last_tick_ns;
 static u32 low_streak;
+static u32 queue_streak;
+static u64 demand;		/* smoothed demand, in CPUs x DEMAND_ONE */
+
+#define DEMAND_ONE	1024
 
 UEI_DEFINE(uei);
 
@@ -221,13 +231,17 @@ void BPF_STRUCT_OPS(compact_stopping, struct task_struct *p, bool runnable)
 		c->run_start = 0;
 	}
 	/* Charge the used part of the slice, scaled by the inverse weight. */
-	scx_bpf_task_set_dsq_vtime(p, p->scx.dsq_vtime +
-		scale_by_task_weight_inverse(p, slice_ns - p->scx.slice));
+	/*
+	 * Linux 6.18 has no scx_bpf_task_set_dsq_vtime() kfunc (the 6.18.53 in-tree
+	 * examples call it, but it arrived later); on 6.18 struct_ops programs may
+	 * write p->scx.dsq_vtime directly (bpf_scx_btf_struct_access()).
+	 */
+	p->scx.dsq_vtime += scale_by_task_weight_inverse(p, slice_ns - p->scx.slice);
 }
 
 void BPF_STRUCT_OPS(compact_enable, struct task_struct *p)
 {
-	scx_bpf_task_set_dsq_vtime(p, vtime_now);
+	p->scx.dsq_vtime = vtime_now;
 }
 
 /*
@@ -236,7 +250,7 @@ void BPF_STRUCT_OPS(compact_enable, struct task_struct *p)
  */
 static int ctl_timerfn(void *map, int *key, struct bpf_timer *timer)
 {
-	u64 now = bpf_ktime_get_ns(), busy = 0, elapsed, cap, queued;
+	u64 now = bpf_ktime_get_ns(), busy = 0, elapsed, cap, queued, inst, need;
 	u32 cpu, n = stats.nr_active, old_n = n, step;
 
 	bpf_for(cpu, 0, nr_cpus) {
@@ -264,13 +278,29 @@ static int ctl_timerfn(void *map, int *key, struct bpf_timer *timer)
 	stats.queued = queued;
 	stats.util_pct = cap ? busy * 100 / cap : 0;
 
-	if (compact_enabled && elapsed) {
-		if (busy * 100 > (u64)expand_pct * cap || queued >= n) {
+	if (!elapsed)
+		goto out;
+	inst = busy * DEMAND_ONE / elapsed;
+	if (ewma_shift && ewma_shift < 16)
+		demand = (demand * ((1U << ewma_shift) - 1) + inst) >> ewma_shift;
+	else
+		demand = inst;
+	stats.demand_pct = demand * 100 / DEMAND_ONE;
+	queue_streak = queued >= n ? queue_streak + 1 : 0;
+
+	if (compact_enabled) {
+		if (demand * 100 > (u64)expand_pct * DEMAND_ONE * n) {
+			/* Smallest set that keeps demand under expand_pct. */
+			need = demand * 100 / ((u64)expand_pct * DEMAND_ONE) + 1;
+			n = need > max_active ? max_active : need;
+			low_streak = 0;
+		} else if (queue_streak >= queue_hold) {
 			step = 1 + queued / 2;
 			n = n + step > max_active ? max_active : n + step;
+			queue_streak = 0;
 			low_streak = 0;
 		} else if (n > min_active && queued == 0 &&
-			   busy * 100 <= (u64)shrink_pct * elapsed * (n - 1)) {
+			   demand * 100 <= (u64)shrink_pct * DEMAND_ONE * (n - 1)) {
 			if (++low_streak >= shrink_hold) {
 				n--;
 				low_streak = 0;
@@ -295,7 +325,7 @@ static int ctl_timerfn(void *map, int *key, struct bpf_timer *timer)
 			stats.nr_active = n;
 		}
 	}
-
+out:
 	bpf_timer_start(timer, interval_ns, 0);
 	return 0;
 }

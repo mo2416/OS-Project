@@ -19,6 +19,7 @@ struct cc_cpu {
 struct cc_global {
 	__u64	nr_active;	/* current size of the active CPU set */
 	__u64	util_pct;	/* demand at last tick, in % of the active set's capacity */
+	__u64	demand_pct;	/* smoothed demand (EWMA), in % of one CPU */
 	__u64	queued;		/* tasks waiting in the shared DSQ at last tick */
 	__u64	nr_ticks;	/* controller ticks executed */
 	__u64	nr_expand;	/* ticks that grew the active set */

@@ -1,0 +1,10 @@
+stats  : enq=0 dsp=0 delta=0 reenq=0 deq=0 core=0 enq_ddsp=2
+         exp_local=0 exp_remote=0 exp_timer=0 exp_lost=0
+cpuperf: cur min/avg/max=0/0/0 target min/avg/max=0/0/0
+stats  : enq=0 dsp=0 delta=0 reenq=0 deq=0 core=0 enq_ddsp=7
+         exp_local=0 exp_remote=0 exp_timer=0 exp_lost=0
+cpuperf: cur min/avg/max=1024/1024/1024 target min/avg/max=0/224/512
+stats  : enq=0 dsp=0 delta=0 reenq=0 deq=0 core=0 enq_ddsp=14
+         exp_local=0 exp_remote=0 exp_timer=0 exp_lost=0
+cpuperf: cur min/avg/max=1024/1024/1024 target min/avg/max=0/224/512
+EXIT: unregistered from user space

@@ -12,9 +12,10 @@ install -m 755 "$HERE/guest_init.sh" "$INIT"
 if [ -w /dev/kvm ]; then ACCEL=(-accel kvm -cpu host); else
   echo "run_vm.sh: WARNING /dev/kvm not accessible -> TCG emulation (timings not meaningful)" >&2
   ACCEL=(-accel tcg,thread=multi -cpu max); fi
-exec qemu-system-x86_64 "${ACCEL[@]}" -L "$QEMU_FW" \
+# Second -L: the sysroot's qemu/bios-256k.bin is an absolute symlink into /usr/share/seabios.
+exec qemu-system-x86_64 "${ACCEL[@]}" -L "$QEMU_FW" -L "$SYSROOT/usr/share/seabios" \
   -smp "$VCPUS",sockets=1,cores=$((VCPUS/2)),threads=2 -m "$MEM" \
   -kernel "$KERNEL" -nographic -no-reboot -nodefaults -serial mon:stdio \
-  -virtfs local,path=/,mount_tag=/dev/root,security_model=none,readonly=on,multidevs=remap \
+  -virtfs local,id=rootfs,path=/,mount_tag=/dev/root,security_model=none,readonly=on,multidevs=remap \
   -virtfs "local,path=$PROJECT,mount_tag=project,security_model=none,multidevs=remap" \
   -append "root=/dev/root rootfstype=9p rootflags=trans=virtio,version=9p2000.L,msize=512000,cache=loose ro console=ttyS0 panic=-1 init=$INIT osproj.job=$JOB"

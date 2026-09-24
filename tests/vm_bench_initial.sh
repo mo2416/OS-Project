@@ -8,7 +8,8 @@ set -u
 source "$PROJECT/tests/lib.sh"
 OUT="$PROJECT/results/raw/bench_initial/$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$OUT"
-OPS="${OPS:-400}"; REPS="${REPS:-3}"; NS="${NS:-1 2 4 8}"
+# OPS: work per worker; ~1.5 s with the int64 method (~4000 ops/s measured on the host)
+OPS="${OPS:-6000}"; REPS="${REPS:-3}"; NS="${NS:-1 2 4 8}"
 record_env
 echo "accel: $(grep -qw hypervisor /proc/cpuinfo && echo guest) ops_per_worker=$OPS reps=$REPS" >> "$OUT/env.txt"
 echo "cond,n,rep,wall_s,ctxt" > "$OUT/runs.csv"

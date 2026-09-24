@@ -7,8 +7,9 @@ dutywork and latprobe; active set from the scx_compact CSV of that rep).
 
 Across the REPS runs of each (condition, duty) it reports mean ± SD, a 95 % confidence
 interval of the mean (Student t) and the median. For the key comparisons it reports the
-difference of means with a 95 % bootstrap CI (10 000 resamples, fixed seed). A difference
-is called "clear" only when that CI excludes 0.
+mean of PAIRED differences (same rep, same duty; conditions are interleaved within a rep,
+so pairing cancels host drift between reps) with a 95 % bootstrap CI (10 000 resamples,
+fixed seed). A difference is called "clear" only when that CI excludes 0.
 
 The energy proxy is the model defined in analyze_partial.py (NOT measured energy).
 
@@ -58,6 +59,14 @@ def boot_diff(a, b, n=10000, seed=1):
     return st.mean(a) - st.mean(b), d[int(0.025 * n)], d[int(0.975 * n) - 1]
 
 
+def boot_paired(a, b, n=10000, seed=1):
+    """95 % bootstrap CI of the mean paired difference a[rep] - b[rep]."""
+    d0 = [a[r] - b[r] for r in sorted(a) if r in b]
+    rng = random.Random(seed)
+    d = sorted(st.mean(rng.choices(d0, k=len(d0))) for _ in range(n))
+    return st.mean(d0), d[int(0.025 * n)], d[int(0.975 * n) - 1]
+
+
 def collect(run):
     ps, ss = parse_procstat(run / "procstat.txt"), parse_sched(run / "sched.txt")
     tick = 100.0
@@ -95,7 +104,7 @@ def collect(run):
                 probe99=float(r["probe_p99_us"]),
                 wait=(sb["delay"] - sa["delay"]) / dp / 1e3 if dp else 0.0,
                 cs=(b["ctxt"] - a["ctxt"]) / dt, irq=(sb["irq"] - sa["irq"]) / dt,
-                idle=sum(idle_s.values()), e=e, pct=pct, lat_pm=None))
+                idle=sum(idle_s.values()), e=e, pct=pct, rep=int(rep)))
     return conds, g
 
 
@@ -120,8 +129,8 @@ def main():
 
     pairs = [("compact", "eevdf"), ("guard", "eevdf"), ("guard", "compact"), ("nocompact", "eevdf")]
     keys = ["used", "slow", "wake99", "probe99", "wait", "e"]
-    L += ["## Differences of means with 95 % bootstrap CI", "",
-          "A difference is **clear** when the CI excludes 0.", "",
+    L += ["## Paired differences (same rep and duty) with 95 % bootstrap CI", "",
+          "Mean of per-rep differences A − B [95 % CI]. **Bold** = CI excludes 0 (clear difference).", "",
           "| duty | A − B | " + " | ".join(dict((k, l) for k, l, _ in METRICS)[k] for k in keys) + " |",
           "|---|---|" + "---|" * len(keys)]
     for d in duties:
@@ -130,7 +139,8 @@ def main():
                 continue
             cells = []
             for k in keys:
-                m, lo, hi = boot_diff([x[k] for x in g[(a, d)]], [x[k] for x in g[(b, d)]])
+                m, lo, hi = boot_paired({x["rep"]: x[k] for x in g[(a, d)]},
+                                        {x["rep"]: x[k] for x in g[(b, d)]})
                 fmt = dict((kk, f) for kk, _, f in METRICS)[k]
                 clear = "**" if lo > 0 or hi < 0 else ""
                 cells.append(f"{clear}{fmt.format(m)} [{fmt.format(lo)}, {fmt.format(hi)}]{clear}")

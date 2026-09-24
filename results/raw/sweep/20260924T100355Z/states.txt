@@ -1,0 +1,7 @@
+base_exit: 0
+s35_exit: 0
+s65_exit: 0
+w0_exit: 0
+w5_exit: 0
+q1_exit: 0
+q4_exit: 0

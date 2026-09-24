@@ -1,0 +1,74 @@
+scx_compact: cpus=8 compact=0 min=2 max=8 expand=80% shrink=50% hold=5 ewma_shift=3 queue_hold=2 interval=20ms slice=5000us order=smt: 0 1 2 3 4 5 6 7
+t=   0.2s active= 8 util=  0% demand=   1% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   3   0   2   0   0   0   0
+t=   0.4s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   0   0
+t=   0.6s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   0   0
+t=   0.8s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   0   0
+t=   1.0s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   0   0
+t=   1.2s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   1   0
+t=   1.4s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   0   0
+t=   1.6s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   0   0
+t=   1.8s active= 8 util=  0% demand=   0% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   0   0   0   0   0   0   0
+t=   2.0s active= 8 util=  3% demand=   5% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 0 |   0   1   0   1   1   0   2   1
+t=   2.3s active= 8 util=100% demand= 523% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  86  79  79  77  78  85  76  78
+t=   2.5s active= 8 util=100% demand= 735% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  95 103 103 103 103 100 103 103
+t=   2.7s active= 8 util= 99% demand= 784% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 104 105 105 106 104  99 104 104
+t=   2.9s active= 8 util= 99% demand= 795% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  99  98  99 100  99  99  99 101
+t=   3.1s active= 8 util= 99% demand= 798% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 101 102 100  98 100  97 101  99
+t=   3.3s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  94 100  93  93  94  97  93  93
+t=   3.5s active= 8 util=100% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 108  97 105 105 105 105 105 105
+t=   3.7s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97 102 102 103 102  94  96 101
+t=   3.9s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 102 101 101  99 100 108 107 101
+t=   4.1s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 100  97  98  98 101  99  99  99
+t=   4.3s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  96  98  96 103  95  97  97  96
+t=   4.5s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  96  96  96  91 105  96  96  96
+t=   4.7s active= 8 util= 99% demand= 798% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 108 104 107 108  94 109 106 107
+t=   5.0s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 100  98  94 100 104  96  95 102
+t=   5.2s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 100 105 106  99 101 103 106  99
+t=   5.4s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  94  96 101  96  96  96  96  95
+t=   5.6s active= 8 util=100% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 105 105 100 105 105 106 105 105
+t=   5.8s active= 8 util= 99% demand= 798% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  95  95  96 100  95  99  99 100
+t=   6.0s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 104 105  96  93  97  94  99  99
+t=   6.2s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  99  98 105 107 105 105 102  99
+t=   6.4s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97  96  97  95  97  97 100  97
+t=   6.6s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  96  96  96  96 106  96  90  96
+t=   6.8s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 106 108 110 106 100 106 106 106
+t=   7.0s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97  99  98 103  94 102 102 101
+t=   7.2s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 106  93  93  98  98 101  93  99
+t=   7.4s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97 105 105  98 105  96 104 103
+t=   7.7s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97  97  97  97  97  97 104  93
+t=   7.9s active= 8 util= 99% demand= 799% queued=  7 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  99 102 105 107 102  97  98 103
+t=   8.1s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 106 104 101  99 104 108 101 101
+t=   8.3s active= 8 util= 99% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  96 100 100  95  95 100  95  97
+t=   8.5s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  96  91 101  96  96  92  96  96
+t=   8.7s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 106 106 100 106 106 106 106 106
+t=   8.9s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 103 101  94  97  97  97  97  97
+t=   9.1s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 100  99 106 104 105 106 106 105
+t=   9.3s active= 8 util= 99% demand= 798% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  99 100  99 101  99  99 100 100
+t=   9.5s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97  98  97 102  98  98  96  98
+t=   9.7s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 104  97  98  94  98  98  98  98
+t=   9.9s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  92 103 106 105 105 106 103 103
+t=  10.1s active= 8 util= 99% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 108 101 100 101  99  99 101 101
+t=  10.3s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 100  99 100  99  96 100 100  99
+t=  10.5s active= 8 util= 99% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  91  93 100  92  97  92  93  93
+t=  10.7s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 106 106  97 109 106 106 106 106
+t=  11.0s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97 103 101  94  97 100 102 100
+t=  11.2s active= 8 util= 99% demand= 798% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 105  99 100 105 105 102 100 102
+t=  11.4s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 101  97  98  98  97  98  97 100
+t=  11.6s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  93  97  95 102 104  95  96  94
+t=  11.8s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 106 106 106  99  99 106 107 106
+t=  12.0s active= 8 util= 99% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 100 100  98 101  94  99  99 100
+t=  12.2s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  92  99 103  91  98  93  96  92
+t=  12.4s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 107 101  98 107 109 108 103 108
+t=  12.6s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  98  96  98  98  96 101  98  97
+t=  12.8s active= 8 util=100% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 102 104 102 102 102  98 102 102
+t=  13.0s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 101  98 101 102 100 100 102 101
+t=  13.2s active= 8 util= 99% demand= 798% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  98  99 101  97 100  99  98  94
+t=  13.4s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 104 104 100 101 102 103 101 107
+t=  13.7s active= 8 util=100% demand= 799% queued=  0 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  97  96 100  97  97  97  97  97
+t=  13.9s active= 8 util= 99% demand= 799% queued=  4 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 104 103 100 103 103 103 103 103
+t=  14.1s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  98  99  99  99 100 100 100  97
+t=  14.3s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 101  99 100 101 100  99  99 102
+t=  14.5s active= 8 util= 99% demand= 799% queued=  2 expand=0 shrink=0 busy_cpus(>=5%)= 8 |  99  92  98  98  98 101  92 100
+t=  14.5s active= 8 util= 99% demand= 799% queued=  1 expand=0 shrink=0 busy_cpus(>=5%)= 8 | 206 647 212 205 206  56 644 204
+EXIT: unregistered from user space
+scx_compact: final ticks=725 expand=0 shrink=0 local=885 shared=10999 pinned=0

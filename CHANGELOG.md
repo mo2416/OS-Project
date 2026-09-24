@@ -4,6 +4,19 @@ All entries are backed by commits; evidence paths are relative to the repository
 
 ## [Unreleased]
 
+## 2026-09-24 — partial-load validation checkpoint (feature freeze)
+### Added
+- `tests/dutywork.c`: fixed-work duty-cycle load with completion time and latency percentiles
+  (built by `make -C scheduler`).
+- Partial-load benchmark (`tests/vm_bench_partial.sh`), sweep (`tests/vm_sweep.sh`),
+  ctxsw check (`tests/vm_ctxsw.sh`) and analyzers (`analyze_partial.py`, `analyze_ctxsw.py`),
+  with a clearly labelled energy proxy.
+- Results: `results/processed/{bench_partial,sweep,ctxsw}_*.md`;
+  `docs/RESULTS_SUMMARY.md`, `docs/REVIEW2_EVIDENCE.md`.
+### Changed
+- README links point at documents that exist.
+- No scheduler code changes in this checkpoint.
+
 ## 2026-09-24 — `e927c43` scheduler built and validated on sched_ext
 ### Added
 - scx_compact runs on the Linux 6.18.53 sched_ext guest under KVM

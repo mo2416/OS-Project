@@ -6,10 +6,10 @@ A Linux CPU scheduler written as a BPF program for **sched_ext**. At low load it
 tasks onto a small, dynamically sized *active CPU set*, and it expands that set as utilization
 or queueing grows. It is evaluated against the default Linux scheduler (EEVDF).
 
-- Project definition: [PRD.md](PRD.md)
 - Why this design: [docs/RESEARCH_DECISION.md](docs/RESEARCH_DECISION.md)
-- Environment and constraints: [docs/ENVIRONMENT_REPORT.md](docs/ENVIRONMENT_REPORT.md)
-- Progress: [docs/PROGRESS_LOG.md](docs/PROGRESS_LOG.md), [docs/PROGRESS_AUDIT.md](docs/PROGRESS_AUDIT.md)
+- Current results: [docs/RESULTS_SUMMARY.md](docs/RESULTS_SUMMARY.md)
+- Review-2 evidence: [docs/REVIEW2_EVIDENCE.md](docs/REVIEW2_EVIDENCE.md)
+- Progress: [docs/PROGRESS_LOG.md](docs/PROGRESS_LOG.md), [docs/PROGRESS_AUDIT.md](docs/PROGRESS_AUDIT.md), [CHANGELOG.md](CHANGELOG.md)
 
 ## Layout
 ```
@@ -20,4 +20,4 @@ tests/       functional tests run inside the VM
 results/     raw/ (unmodified outputs) and processed/ (tables derived by scripts)
 docs/        design notes, logs, Review-2 material
 ```
-Build and run instructions: see "Reproducing" in [docs/SCHED_EXT_NOTES.md](docs/SCHED_EXT_NOTES.md).
+Build and run: "Current state" in [docs/PROGRESS_LOG.md](docs/PROGRESS_LOG.md) and the reproduce column in [docs/REVIEW2_EVIDENCE.md](docs/REVIEW2_EVIDENCE.md).

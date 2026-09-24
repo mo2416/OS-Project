@@ -1,0 +1,6 @@
+nocompact_r1_exit: 0
+compact_r1_exit: 0
+compact_m8_r1_exit: 0
+nocompact_r2_exit: 0
+compact_r2_exit: 0
+compact_m8_r2_exit: 0

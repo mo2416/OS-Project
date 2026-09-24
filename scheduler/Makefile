@@ -24,6 +24,7 @@ all:
 	cd $(KSRC)/tools/sched_ext && $(MAKE) O=$(SCXOUT) VMLINUX_BTF=$(KOUT)/vmlinux \
 		c-sched-targets="$(TARGETS)" $(addprefix $(SCXOUT)/build/bin/,$(TARGETS))
 	mkdir -p build && cp $(addprefix $(SCXOUT)/build/bin/,$(TARGETS)) build/
+	$(CC) -O2 -Wall -Werror -pthread -o build/dutywork ../tests/dutywork.c
 	@ls -l build/
 
 clean:

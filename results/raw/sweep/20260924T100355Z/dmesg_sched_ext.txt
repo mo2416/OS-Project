@@ -1,0 +1,14 @@
+[   11.826538] sched_ext: BPF scheduler "compact" enabled
+[   52.396177] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[   52.592610] sched_ext: BPF scheduler "compact" enabled
+[   93.224519] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[   93.429310] sched_ext: BPF scheduler "compact" enabled
+[  134.539280] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[  134.791821] sched_ext: BPF scheduler "compact" enabled
+[  175.632271] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[  175.836347] sched_ext: BPF scheduler "compact" enabled
+[  216.984155] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[  217.801556] sched_ext: BPF scheduler "compact" enabled
+[  259.231191] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)
+[  259.621509] sched_ext: BPF scheduler "compact" enabled
+[  301.402079] sched_ext: BPF scheduler "compact" disabled (unregistered from user space)

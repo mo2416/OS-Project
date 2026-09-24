@@ -1,0 +1,2 @@
+nocompact_exit: 0
+compact_exit: 0
